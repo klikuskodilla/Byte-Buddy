@@ -3,8 +3,14 @@ package com.kodilla.agent;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.AgentBuilder.Default;
 import net.bytebuddy.asm.Advice;
+import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.matcher.ElementMatchers;
+import net.bytebuddy.utility.JavaModule;
+
 import java.lang.instrument.Instrumentation;
+
+import static net.bytebuddy.matcher.ElementMatchers.none;
 
 public class Agent {
 
@@ -15,12 +21,16 @@ public class Agent {
         System.out.println(
                 "Is retransform classes allowed: " + instrumentation.isRetransformClassesSupported());
 
-        AgentBuilder agentBuilder = new Default()
+        AgentBuilder agentBuilder;
+        agentBuilder = new Default()
+                .with(AgentBuilder.TypeStrategy.Default.DECORATE)
+                .disableClassFormatChanges()
+                .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                 .type(ElementMatchers.nameStartsWith("com.kodilla"))
-                .transform(((builder, typeDescription, classLoader, module) -> {
+                .transform((builder, typeDescription, classLoader, module) -> {
                     System.out.println("Class " + typeDescription);
-                    return builder.visit(Advice.to(MyMethodMonitor.class).on(ElementMatchers.any()));
-                }));
+                    return builder.visit(Advice.to(MyMethodMonitor.class).on(ElementMatchers.isMethod()));
+                });
 
         agentBuilder.installOn(instrumentation);
     }

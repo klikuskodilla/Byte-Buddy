@@ -10,6 +10,11 @@ repositories {
 }
 
 jar {
+    archiveClassifier = "all"
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
     manifest {
         attributes(
                 'Premain-Class' : 'com.kodilla.agent.Agent',
@@ -21,5 +26,5 @@ jar {
 
 dependencies {
     implementation 'net.bytebuddy:byte-buddy:1.10.13'
-    testImplementation group: 'junit', name: 'junit', version: '5.8'
+//    testImplementation group: 'junit', name: 'junit', version: '5.8'
 }

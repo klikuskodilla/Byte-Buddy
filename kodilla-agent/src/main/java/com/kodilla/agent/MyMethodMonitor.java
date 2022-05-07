@@ -4,12 +4,12 @@ import net.bytebuddy.asm.Advice;
 
 public class MyMethodMonitor {
 
-    @Advice.OnMethodEnter
-    public static void enter(@Advice.Origin Class clazz, @Advice.Origin("#m") String methodName) {
+    @Advice.OnMethodEnter(suppress = Throwable.class)
+    public static void enter( @Advice.Origin("#m") String methodName) {
         System.out.println("Entering method: " + methodName);
     }
 
-    @Advice.OnMethodExit
+    @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
     public static void exit() {
         System.out.println("Exiting method.");
     }
